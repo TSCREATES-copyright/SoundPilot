@@ -1,0 +1,58 @@
+CREATE TABLE IF NOT EXISTS songs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  file_path TEXT NOT NULL,
+  bpm INTEGER,
+  key TEXT,
+  genre TEXT,
+  mood TEXT,
+  energy TEXT,
+  version TEXT DEFAULT 'v1',
+  notes TEXT,
+  tags TEXT DEFAULT '[]',
+  play_count INTEGER DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  description TEXT,
+  status TEXT DEFAULT 'active',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS project_songs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id INTEGER REFERENCES projects(id),
+  song_id INTEGER REFERENCES songs(id)
+);
+
+CREATE TABLE IF NOT EXISTS rule_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  song_id INTEGER,
+  rule_id TEXT,
+  message TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS lyric_drafts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  song_id INTEGER REFERENCES songs(id),
+  structure TEXT DEFAULT 'verse-chorus',
+  status TEXT DEFAULT 'draft',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS lyric_sections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  draft_id INTEGER REFERENCES lyric_drafts(id),
+  section_type TEXT NOT NULL,
+  position INTEGER DEFAULT 0,
+  content TEXT DEFAULT '',
+  syllable_counts TEXT DEFAULT '[]',
+  rhyme_scheme TEXT DEFAULT '',
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

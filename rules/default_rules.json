@@ -1,0 +1,142 @@
+[
+  {
+    "rule_id": "version_pattern",
+    "trigger": "song_upload",
+    "priority": 10,
+    "condition": { "field": "title", "op": "contains_any", "value": ["demo", "rough", "v1"] },
+    "action": {
+      "type": "warning",
+      "message": "This looks like an early draft. Set a reminder to revisit it."
+    }
+  },
+  {
+    "rule_id": "duplicate_title",
+    "trigger": "song_upload",
+    "priority": 11,
+    "condition": { "field": "title", "op": "duplicate_title", "value": true },
+    "action": {
+      "type": "warning",
+      "message": "You may have uploaded this track before. Check your library."
+    }
+  },
+  {
+    "rule_id": "prolific_streak",
+    "trigger": "song_upload",
+    "priority": 12,
+    "condition": { "field": "uploads_last_7_days", "op": ">=", "value": 3 },
+    "action": {
+      "type": "insight",
+      "message": "You've uploaded X tracks this week. You're on a roll."
+    }
+  },
+  {
+    "rule_id": "dormancy_alert",
+    "trigger": "song_upload",
+    "priority": 13,
+    "condition": { "field": "days_since_last_upload", "op": ">", "value": 14 },
+    "action": {
+      "type": "suggestion",
+      "message": "It's been a while since your last upload. Time to create?"
+    }
+  },
+  {
+    "rule_id": "unfinished_projects",
+    "trigger": "song_upload",
+    "priority": 14,
+    "condition": { "field": "unfinished_projects", "op": ">", "value": 0 },
+    "action": {
+      "type": "suggestion",
+      "message": "Your project '[name]' has no songs yet. Start adding tracks."
+    }
+  },
+  {
+    "rule_id": "energy_high",
+    "trigger": "song_upload",
+    "priority": 21,
+    "condition": { "field": "energy", "op": "==", "value": "high" },
+    "action": {
+      "type": "insight",
+      "message": "High energy track detected. Could work well for workout, hype, or action content."
+    }
+  },
+  {
+    "rule_id": "energy_low",
+    "trigger": "song_upload",
+    "priority": 22,
+    "condition": { "field": "energy", "op": "==", "value": "low" },
+    "action": {
+      "type": "suggestion",
+      "message": "Low energy detected. This track may suit background, ambient, or study playlists."
+    }
+  },
+  {
+    "rule_id": "mid_tempo",
+    "trigger": "song_upload",
+    "priority": 23,
+    "condition": { "field": "bpm", "op": "between", "min": 70, "max": 100 },
+    "action": {
+      "type": "insight",
+      "message": "Mid-tempo range (70–100 BPM). Versatile for R&B, hip-hop, and soul production."
+    }
+  },
+  {
+    "rule_id": "high_energy_upload",
+    "trigger": "song_upload",
+    "priority": 24,
+    "condition": { "field": "energy", "op": "==", "value": "high" },
+    "action": {
+      "type": "insight",
+      "message": "High energy track. Strong fit for hype, workout, or action-driven content."
+    }
+  },
+  {
+    "rule_id": "low_energy_upload",
+    "trigger": "song_upload",
+    "priority": 25,
+    "condition": { "field": "energy", "op": "==", "value": "low" },
+    "action": {
+      "type": "suggestion",
+      "message": "Low energy detected. Consider ambient, study, or background playlist positioning."
+    }
+  },
+  {
+    "rule_id": "slow_bpm",
+    "trigger": "song_upload",
+    "priority": 30,
+    "condition": { "field": "bpm", "op": "<", "value": 70 },
+    "action": {
+      "type": "suggestion",
+      "message": "Slow tempo detected. Consider ambient or cinematic genres."
+    }
+  },
+  {
+    "rule_id": "fast_bpm",
+    "trigger": "song_upload",
+    "priority": 31,
+    "condition": { "field": "bpm", "op": ">", "value": 140 },
+    "action": {
+      "type": "suggestion",
+      "message": "High energy tempo! Could work well as drum & bass or hardstyle."
+    }
+  },
+  {
+    "rule_id": "replay_insight",
+    "trigger": "song_play",
+    "priority": 40,
+    "condition": { "field": "play_count", "op": ">", "value": 5 },
+    "action": {
+      "type": "insight",
+      "message": "You keep coming back to this track. Consider turning it into a project."
+    }
+  },
+  {
+    "rule_id": "replay_obsession",
+    "trigger": "song_play",
+    "priority": 41,
+    "condition": { "field": "play_count", "op": ">", "value": 10 },
+    "action": {
+      "type": "insight",
+      "message": "You've played this over 10 times. Your instincts are telling you something — this track deserves more attention."
+    }
+  }
+]
