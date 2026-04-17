@@ -2,7 +2,7 @@
 // API BASE (Render backend)
 // ============================
 const API_BASE =
-  import.meta.env.DEV
+  import.meta.env.MODE === 'development'
     ? 'http://localhost:3001'
     : import.meta.env.VITE_API_URL
 
