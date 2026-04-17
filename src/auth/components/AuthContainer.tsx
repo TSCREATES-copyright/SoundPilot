@@ -39,7 +39,6 @@ export default function AuthContainer() {
             </p>
           </div>
           <p className="auth-brand-foot">
-            Built for those who move fast, iterate often, and need clean creative focus.
           </p>
         </aside>
 
