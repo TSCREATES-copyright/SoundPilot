@@ -187,7 +187,7 @@ function Home() {
           {/* Top row — 3 equal columns */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
             gap: '20px'
           }}>
             {/* Quick Upload */}
@@ -259,7 +259,7 @@ function Home() {
           {/* Bottom row — 2 columns */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '20px'
           }}>
             {/* Pilot Insights */}

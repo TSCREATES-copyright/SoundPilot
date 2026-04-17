@@ -17,7 +17,7 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-[#0f0f0f] text-white">
+      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[#0f0f0f] text-white px-4 text-center">
         Loading session...
       </div>
     )
@@ -33,37 +33,16 @@ export default function App() {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      height: '100vh',
-      width: '100vw',
-      overflow: 'hidden',
-      background: '#0f0f0f',
-      color: '#ffffff'
-    }}>
+    <div className="app-shell">
 
       {/* Sidebar — fixed left column */}
       <Sidebar />
 
       {/* Right side — page + player stacked vertically */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        overflow: 'hidden',
-        minWidth: 0
-      }}>
+      <div className="app-main">
 
         {/* Page content — scrollable */}
-        <main style={{
-          flex: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          padding: '32px',
-          paddingBottom: '24px',
-          minWidth: 0
-        }}>
+        <main className="app-routes">
           <Routes>
             <Route path="/auth" element={<Navigate to="/" replace />} />
             <Route path="/" element={<Home />} />

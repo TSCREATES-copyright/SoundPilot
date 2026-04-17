@@ -39,6 +39,7 @@ export default function AuthContainer() {
             </p>
           </div>
           <p className="auth-brand-foot">
+            Built for artists and producers who need momentum from first idea to finished release.
           </p>
         </aside>
 

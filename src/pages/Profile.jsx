@@ -239,7 +239,7 @@ function Profile() {
         {/* 3-column grid for DNA stats */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: '32px',
           marginTop: '24px'
         }}>
@@ -271,7 +271,7 @@ function Profile() {
       {/* Stats grid — 3 columns */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
         gap: '16px',
         marginBottom: '24px'
       }}>

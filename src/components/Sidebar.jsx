@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { getRuleNotifications } from '../utils/api'
 import { useAuth } from '../auth/hooks/useAuth'
 
@@ -15,11 +15,13 @@ const links = [
 ]
 
 function Sidebar() {
+  const location = useLocation()
   const navigate = useNavigate()
   const { logout, currentUser } = useAuth()
   const [notifications, setNotifications] = useState([])
   const [showPanel, setShowPanel] = useState(false)
   const [dismissed, setDismissed] = useState(new Set())
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const fetchNotifications = async () => {
     if (!currentUser?.uid) {
@@ -40,6 +42,10 @@ function Sidebar() {
     const int = setInterval(fetchNotifications, 5 * 60 * 1000)
     return () => clearInterval(int)
   }, [currentUser?.uid])
+
+  useEffect(() => {
+    setMobileNavOpen(false)
+  }, [location.pathname])
 
   const activeNotifs = notifications.filter(n => !dismissed.has(n.id))
 
@@ -67,27 +73,27 @@ function Sidebar() {
 
   return (
     <>
-      <div style={{
-        width: '220px',
-        minWidth: '220px',
-        flexShrink: 0,
-        height: '100vh',
-        background: '#111111',
-        borderRight: '1px solid #1f1f1f',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-        overflowX: 'hidden'
-      }}>
-        <div className="p-4 flex flex-col h-full">
-          <h1 className="mb-6 text-xl font-bold text-accent">SoundPilot</h1>
-          <nav className="flex flex-col gap-2 flex-1">
+      <aside className="sidebar-shell">
+        <div className="sidebar-inner">
+          <div className="sidebar-header">
+            <h1 className="text-xl font-bold text-accent">SoundPilot</h1>
+            <button
+              onClick={() => setMobileNavOpen((prev) => !prev)}
+              className="sidebar-mobile-toggle"
+              aria-label="Toggle navigation"
+              aria-expanded={mobileNavOpen}
+            >
+              ☰
+            </button>
+          </div>
+
+          <nav className={`sidebar-nav ${mobileNavOpen ? 'is-open' : ''}`}>
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `rounded-full px-3 py-2 text-sm transition ${
+                  `sidebar-link rounded-full px-3 py-2 text-sm transition ${
                     isActive ? 'bg-accent text-black font-semibold' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                   }`
                 }
@@ -97,17 +103,17 @@ function Sidebar() {
             ))}
           </nav>
 
-          <div className="mt-auto border-t border-border pt-4">
+          <div className="sidebar-footer">
             <button
               onClick={handleLogout}
-              className="mb-2 flex w-full items-center gap-2 rounded-lg p-2 text-sm font-semibold text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+              className="sidebar-action mb-2 flex w-full items-center gap-2 rounded-lg p-2 text-sm font-semibold text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
             >
               <span>↩</span>
               <span>Logout</span>
             </button>
             <button
               onClick={() => setShowPanel(true)}
-              className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-zinc-800 transition text-zinc-300 group"
+              className="sidebar-action flex items-center gap-3 w-full p-2 rounded-lg hover:bg-zinc-800 transition text-zinc-300 group"
             >
               <div className="relative">
                 <span className="text-xl group-hover:animate-pulse">🔔</span>
@@ -121,13 +127,13 @@ function Sidebar() {
             </button>
           </div>
         </div>
-      </div>
+      </aside>
 
       {/* Slide-out Notif Panel */}
       {showPanel && (
         <>
           <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setShowPanel(false)} />
-          <div className="fixed top-0 left-56 w-80 h-full bg-[#111] border-r border-border z-50 shadow-2xl flex flex-col transform transition-transform">
+          <div className="fixed top-0 right-0 w-full sm:w-80 h-full bg-[#111] border-l border-border z-50 shadow-2xl flex flex-col transform transition-transform">
             <div className="p-4 border-b border-border flex justify-between items-center bg-[#151515]">
               <h2 className="font-bold text-white flex items-center gap-2">
                 <span>Inbox</span>

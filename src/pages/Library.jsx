@@ -270,7 +270,7 @@ function Library() {
           )}
         </div>
 
-        <div className="panel overflow-visible">
+        <div className="panel overflow-x-auto">
           {loading ? (
             <div className="flex items-center justify-center p-12"><Spinner /></div>
           ) : songs.length === 0 ? (

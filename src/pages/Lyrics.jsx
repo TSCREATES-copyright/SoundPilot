@@ -153,10 +153,10 @@ export default function Lyrics() {
   }
 
   return (
-    <div style={{ width: '100%', height: '100%', boxSizing: 'border-box' }}>
-      <div style={{ display: 'flex', height: '100%', gap: '0', overflow: 'hidden' }}>
+    <div className="lyrics-page">
+      <div className="lyrics-layout">
         {/* LEFT PANEL */}
-        <div style={{ width: '280px', flexShrink: 0, height: '100%', overflowY: 'auto', borderRight: '1px solid #2a2a2a', background: '#181818' }}>
+        <div className="lyrics-left-panel">
           <div className="p-4 flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white tracking-wide">✍️ Lyrics</h2>
@@ -260,7 +260,7 @@ export default function Lyrics() {
         </div>
 
         {/* RIGHT PANEL - Editor */}
-        <div style={{ flex: 1, height: '100%', overflowY: 'auto', padding: '24px' }}>
+        <div className="lyrics-main-panel">
           {!activeDraft ? (
             <div className="h-full flex flex-col items-center justify-center text-center">
               <span className="text-5xl mb-4">✍️</span>
@@ -287,7 +287,7 @@ export default function Lyrics() {
 
         {/* RHYMES TOOLBAR PANEL */}
         {showRhymes && (
-          <div style={{ width: '260px', flexShrink: 0, height: '100%', overflowY: 'auto', background: '#111111', borderLeft: '1px solid #2a2a2a' }}>
+          <div className="lyrics-rhymes-panel">
             <div className="p-4 flex flex-col h-full relative">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-white font-bold">Rhymes</h3>
