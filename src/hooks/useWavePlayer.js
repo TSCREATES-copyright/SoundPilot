@@ -68,10 +68,11 @@ export function useWavePlayer() {
   }, [volume, isLooping])
 
   const loadSong = useCallback((url, songData) => {
-    // Ensure URL is absolute for WaveSurfer
-    const fullUrl = url.startsWith('http')
-      ? url
-      : `http://localhost:3001${url}`
+    // Ensure URL is absolute for WaveSurfer without backend host coupling
+    const fullUrl =
+      url.startsWith('http') || url.startsWith('blob:')
+        ? url
+        : new URL(url, window.location.origin).toString()
 
     setIsLoading(true)
     setIsReady(false)

@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner'
 import { getProjects, createProject, getSongs, updateProject, deleteProject, updateSong } from '../utils/api'
 import { useToast } from '../components/ToastProvider'
 import { usePlayer } from '../context/PlayerContext'
+import { useAuth } from '../auth/hooks/useAuth'
 
 export default function Projects() {
   const [projects, setProjects] = useState([])
@@ -16,8 +17,16 @@ export default function Projects() {
   
   const toast = useToast()
   const player = usePlayer()
+  const { currentUser } = useAuth()
 
   const loadData = async () => {
+    if (!currentUser?.uid) {
+      setProjects([])
+      setSongs([])
+      setLoading(false)
+      return
+    }
+
     try {
       const [p, s] = await Promise.all([getProjects(), getSongs()])
       setProjects(Array.isArray(p) ? p : [])
@@ -33,8 +42,9 @@ export default function Projects() {
   }
 
   useEffect(() => {
+    setLoading(true)
     loadData()
-  }, [])
+  }, [currentUser?.uid])
 
   const handleCreate = async (e) => {
     e.preventDefault()

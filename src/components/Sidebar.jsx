@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { getRuleNotifications } from '../utils/api'
+import { useAuth } from '../auth/hooks/useAuth'
 
 const links = [
   { to: '/', label: '🏠 Home' },
@@ -14,11 +15,18 @@ const links = [
 ]
 
 function Sidebar() {
+  const navigate = useNavigate()
+  const { logout, currentUser } = useAuth()
   const [notifications, setNotifications] = useState([])
   const [showPanel, setShowPanel] = useState(false)
   const [dismissed, setDismissed] = useState(new Set())
 
   const fetchNotifications = async () => {
+    if (!currentUser?.uid) {
+      setNotifications([])
+      return
+    }
+
     try {
       const data = await getRuleNotifications()
       setNotifications(data ?? [])
@@ -31,7 +39,7 @@ function Sidebar() {
     fetchNotifications()
     const int = setInterval(fetchNotifications, 5 * 60 * 1000)
     return () => clearInterval(int)
-  }, [])
+  }, [currentUser?.uid])
 
   const activeNotifs = notifications.filter(n => !dismissed.has(n.id))
 
@@ -47,6 +55,14 @@ function Sidebar() {
     if (p === 1) return 'bg-red-500/20 text-red-500 border border-red-500/30'
     if (p === 2) return 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'
     return 'bg-green-500/20 text-green-500 border border-green-500/30'
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } finally {
+      navigate('/auth', { replace: true })
+    }
   }
 
   return (
@@ -82,6 +98,13 @@ function Sidebar() {
           </nav>
 
           <div className="mt-auto border-t border-border pt-4">
+            <button
+              onClick={handleLogout}
+              className="mb-2 flex w-full items-center gap-2 rounded-lg p-2 text-sm font-semibold text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+            >
+              <span>↩</span>
+              <span>Logout</span>
+            </button>
             <button
               onClick={() => setShowPanel(true)}
               className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-zinc-800 transition text-zinc-300 group"

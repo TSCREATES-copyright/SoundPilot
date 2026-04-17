@@ -7,6 +7,7 @@ import {
   getRhymes, getSyllables, getWritingPrompts, getSongs, analyzeLyrics
 } from '../utils/api'
 import { useToast } from '../components/ToastProvider'
+import { useAuth } from '../auth/hooks/useAuth'
 
 const STRUCTURE_OPTIONS = [
   { id: 'verse-chorus', label: "Verse / Chorus / Bridge (Standard)" },
@@ -31,6 +32,7 @@ function debounce(fn, ms) {
 
 export default function Lyrics() {
   const toast = useToast()
+  const { currentUser } = useAuth()
   const [drafts, setDrafts] = useState([])
   const [songs, setSongs] = useState([])
   const [activeDraft, setActiveDraft] = useState(null)
@@ -53,6 +55,14 @@ export default function Lyrics() {
 
   // Load Initial
   useEffect(() => {
+    if (!currentUser?.uid) {
+      setDrafts([])
+      setSongs([])
+      setActiveDraft(null)
+      setLoading(false)
+      return
+    }
+
     Promise.all([getLyricDrafts(), getSongs()])
       .then(([d, s]) => {
         setDrafts(Array.isArray(d) ? d : [])
@@ -64,9 +74,10 @@ export default function Lyrics() {
         toast.error('Failed to load drafts')
         setLoading(false)
       })
-  }, [])
+  }, [currentUser?.uid])
 
   const loadDraft = async (id) => {
+    if (!currentUser?.uid) return
     try {
       const d = await getLyricDraft(id)
       setActiveDraft(d)
@@ -79,6 +90,7 @@ export default function Lyrics() {
 
   const handleCreate = async (e) => {
     e.preventDefault()
+    if (!currentUser?.uid) return
     if (!newTitle.trim()) return
     try {
       const d = await createLyricDraft({
@@ -101,6 +113,7 @@ export default function Lyrics() {
 
   const handleDeleteDraft = async (e, id) => {
     e.stopPropagation()
+    if (!currentUser?.uid) return
     try {
       await deleteLyricDraft(id)
       setDrafts(drafts.filter((d) => d.id !== id))

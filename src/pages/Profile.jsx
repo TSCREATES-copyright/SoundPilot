@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import Spinner from '../components/Spinner'
 import { getProjects, getSongs, getProducerScore } from '../utils/api'
 import { useToast } from '../components/ToastProvider'
+import { useAuth } from '../auth/hooks/useAuth'
 
 // Computes the creative DNA based on actual library data
 function computeDNA(songs, projects) {
@@ -159,8 +160,17 @@ function Profile() {
   const [producerScore, setProducerScore] = useState(null)
   const [loading, setLoading] = useState(true)
   const toast = useToast()
+  const { currentUser } = useAuth()
 
   useEffect(() => {
+    if (!currentUser?.uid) {
+      setSongs([])
+      setProjects([])
+      setProducerScore(null)
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     Promise.all([getSongs(), getProjects(), getProducerScore()]).then(([songData, projectData, scoreData]) => {
       setSongs(Array.isArray(songData) ? songData : [])
@@ -172,7 +182,7 @@ function Profile() {
     }).finally(() => {
       setLoading(false)
     })
-  }, [])
+  }, [currentUser?.uid])
 
   if (loading) {
     return (

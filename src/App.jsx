@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Player from './components/Player'
 import Home from './pages/Home'
@@ -9,8 +9,29 @@ import Explore from './pages/Explore'
 import Coach from './pages/Coach'
 import Producer from './pages/Producer'
 import Profile from './pages/Profile'
+import AuthContainer from './auth/components/AuthContainer'
+import { useAuth } from './auth/hooks/useAuth'
 
 export default function App() {
+  const { currentUser, isLoading } = useAuth()
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-[#0f0f0f] text-white">
+        Loading session...
+      </div>
+    )
+  }
+
+  if (!currentUser) {
+    return (
+      <Routes>
+        <Route path="/auth" element={<AuthContainer />} />
+        <Route path="*" element={<Navigate to="/auth" replace />} />
+      </Routes>
+    )
+  }
+
   return (
     <div style={{
       display: 'flex',
@@ -44,6 +65,7 @@ export default function App() {
           minWidth: 0
         }}>
           <Routes>
+            <Route path="/auth" element={<Navigate to="/" replace />} />
             <Route path="/" element={<Home />} />
             <Route path="/library" element={<Library />} />
             <Route path="/lyrics" element={<Lyrics />} />
@@ -52,6 +74,7 @@ export default function App() {
             <Route path="/coach" element={<Coach />} />
             <Route path="/producer" element={<Producer />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
 

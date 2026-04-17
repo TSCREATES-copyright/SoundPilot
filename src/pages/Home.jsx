@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner'
 import UploadBox from '../components/UploadBox'
 import { getRuleLogs, getSongs, getLyricDrafts, getProjects } from '../utils/api'
 import { useToast } from '../components/ToastProvider'
+import { useAuth } from '../auth/hooks/useAuth'
 
 // Computes the creative DNA based on actual library data
 function computeDNA(songs, projects) {
@@ -109,8 +110,18 @@ function Home() {
   const [drafts, setDrafts] = useState([])
   const [loading, setLoading] = useState(true)
   const toast = useToast()
+  const { currentUser } = useAuth()
 
   const loadData = async () => {
+    if (!currentUser?.uid) {
+      setSongs([])
+      setProjects([])
+      setLogs([])
+      setDrafts([])
+      setLoading(false)
+      return
+    }
+
     try {
       const [songData, pData, logData, draftsData] = await Promise.all([
         getSongs(), 
@@ -135,8 +146,9 @@ function Home() {
   }
 
   useEffect(() => {
+    setLoading(true)
     loadData()
-  }, [])
+  }, [currentUser?.uid])
 
   const dna = computeDNA(songs, projects)
 

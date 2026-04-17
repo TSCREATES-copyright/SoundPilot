@@ -3,6 +3,7 @@ import { analyzeAudioFile } from '../utils/audioAnalyzer'
 import { uploadSong } from '../utils/api'
 import { useToast } from './ToastProvider'
 import RuleAlert from './RuleAlert'
+import { useAuth } from '../auth/hooks/useAuth'
 
 const initialMeta = {
   title: '',
@@ -21,6 +22,7 @@ function formatEnergy(value) {
 function UploadBox({ onUploaded }) {
   const fileInputRef = useRef(null)
   const toast = useToast()
+  const { currentUser } = useAuth()
 
   const [file, setFile] = useState(null)
   const [meta, setMeta] = useState(initialMeta)
@@ -55,6 +57,10 @@ function UploadBox({ onUploaded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!currentUser?.uid) {
+      toast.error('Please sign in to upload songs')
+      return
+    }
     if (!file || !meta.title.trim()) return
 
     const formData = new FormData()
@@ -187,7 +193,7 @@ function UploadBox({ onUploaded }) {
             />
           </label>
 
-          <button className="btn-primary" type="submit" disabled={isAnalyzing}>
+          <button className="btn-primary" type="submit" disabled={isAnalyzing || !currentUser?.uid}>
             Upload Song
           </button>
         </form>

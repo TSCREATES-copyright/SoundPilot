@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Spinner from '../components/Spinner'
 import { getProducerReport, getPlugins } from '../utils/api'
 import { useToast } from '../components/ToastProvider'
+import { useAuth } from '../auth/hooks/useAuth'
 
 const TABS = [
   { id: 'patterns', label: 'Patterns' },
@@ -37,8 +38,16 @@ export default function Producer() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('patterns')
   const toast = useToast()
+  const { currentUser } = useAuth()
 
   useEffect(() => {
+    if (!currentUser?.uid) {
+      setReport(null)
+      setPlugins([])
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     Promise.all([getProducerReport(), getPlugins()])
       .then(([rep, plugs]) => {
@@ -54,7 +63,7 @@ export default function Producer() {
       .finally(() => {
         setLoading(false)
       })
-  }, [])
+  }, [currentUser?.uid])
 
   if (loading) return <div className="flex items-center justify-center p-12 h-screen"><Spinner /></div>
 

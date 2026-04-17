@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner'
 import { useToast } from '../components/ToastProvider'
 import { usePlayer } from '../context/PlayerContext'
 import { getRuleLogs, getSongs, playSong, updateSong, deleteSong } from '../utils/api'
+import { useAuth } from '../auth/hooks/useAuth'
 
 const versionOptions = ['v1', 'Demo', 'Master', 'Mix', 'Final']
 
@@ -102,8 +103,16 @@ function Library() {
   const [searchParams, setSearchParams] = useSearchParams()
   const toast = useToast()
   const { loadSong } = usePlayer()
+  const { currentUser } = useAuth()
 
   const loadData = async () => {
+    if (!currentUser?.uid) {
+      setSongs([])
+      setLogs([])
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     try {
       const [songData, logData] = await Promise.all([getSongs(), getRuleLogs()])
@@ -121,7 +130,7 @@ function Library() {
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [currentUser?.uid])
 
   useEffect(() => {
     if (!songs.length) return
