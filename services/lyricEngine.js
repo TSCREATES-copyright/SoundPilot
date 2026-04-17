@@ -496,38 +496,19 @@ const FAMILY_PATTERNS = [
   ['oo', 'F_OO'], ['ew', 'F_OO'], ['ue', 'F_OO'],
   ['orn', 'F_ORN'], ['ore', 'F_ORE'], ['ort', 'F_ORT'], ['ord', 'F_ORD'],
   ['art', 'F_ART'], ['ark', 'F_ARK'], ['ard', 'F_ARD'], ['arm', 'F_ARM'],
-  ['all', 'F_ALL'], ['alk', 'F_ALL'], ['aul', 'F_ALL'],
+  ['all', 'F_ALL'], ['alk', 'F_ALL'], ['aul', 'F_AUL'],
   ['ack', 'F_ACK'], ['act', 'F_ACT'], ['ap', 'F_AP'], ['ab', 'F_AB'],
   ['at', 'F_AT'], ['an', 'F_AN'], ['am', 'F_AM'], ['ash', 'F_ASH'],
   ['air', 'F_AIR'], ['are', 'F_AIR'], ['ear', 'F_EAR'],
   ['tion', 'F_SHUN'], ['sion', 'F_SHUN'], ['cian', 'F_SHUN'],
   ['azer', 'F_AZR'], ['aser', 'F_AZR'], ['azor', 'F_AZR'],
+
+  // Extra accuracy helpers
+  ['air', 'F_AIR'], ['ear', 'F_EAR'], ['ure', 'F_OO'], ['ier', 'F_EAR'],
+  ['ite', 'F_ITE'], ['ide', 'F_ID'], ['int', 'F_INT'], ['elt', 'F_ELT'],
+  ['ord', 'F_ORD'], ['ard', 'F_ARD'], ['arm', 'F_ARM'], ['aul', 'F_AUL'],
+  ['ub', 'F_UB'], ['ut', 'F_UT'], ['ob', 'F_OB'], ['og', 'F_OG'], ['ot', 'F_OT'],
 ]
-
-function detectFamily(origWord) {
-  const word = origWord.toLowerCase().trim()
-  
-  // Handle silent 'e' and common suffixes
-  let searchWord = word
-  if (word.endsWith('e') && !word.endsWith('ee') && word.length > 3) {
-    searchWord = word.slice(0, -1)
-  }
-
-  for (const [pattern, family] of FAMILY_PATTERNS) {
-    if (word.endsWith(pattern) || searchWord.endsWith(pattern)) {
-      // Accuracy check for silent 'e'
-      if (family === 'F_IP' && word.endsWith('ipe')) return 'F_IPE'
-      if (family === 'F_IT' && word.endsWith('ite')) return 'F_ITE'
-      if (family === 'F_ID' && word.endsWith('ide')) return 'F_IDE'
-      return family
-    }
-  }
-
-  // Slang endings (-er -> -air)
-  if (word.endsWith('er') && word.length > 3) return 'F_AIR'
-
-  return 'F_' + word.slice(-2).toUpperCase()
-}
 
 const NEAR_FAMILY_MAP = {
   'F_IGHT': ['F_ITE', 'F_IPE', 'F_INE'],
@@ -536,7 +517,7 @@ const NEAR_FAMILY_MAP = {
   'F_YPE': ['F_IPE', 'F_ITE', 'F_IGHT'],
   'F_EEN': ['F_EEL', 'F_EED', 'F_EEP', 'F_EEK'],
   'F_EEL': ['F_EEN', 'F_EED', 'F_EEP'],
-  'F_EED': ['F_EEN', 'F_EEL', 'F_EEK'],
+  'F_EED': ['F_EEN', 'F_EEL', 'F_EEP'],
   'F_EEP': ['F_EEN', 'F_EEL', 'F_EED'],
   'F_EEK': ['F_EEN', 'F_EED', 'F_EEP'],
   'F_AIN': ['F_ANE', 'F_AME', 'F_ACE', 'F_AY'],
@@ -568,120 +549,1275 @@ const NEAR_FAMILY_MAP = {
   'F_AIR': ['F_EAR', 'F_ACE', 'F_AY', 'F_AZR'],
   'F_SHUN': ['F_UN', 'F_ONE'],
   'F_AZR': ['F_AZE', 'F_AIR', 'F_EAR'],
-}
-
-function getNearFamilies(family) {
-  return NEAR_FAMILY_MAP[family] || []
+  'F_ITE': ['F_IGHT', 'F_IPE', 'F_INE'],
+  'F_ID': ['F_ILL', 'F_IT', 'F_IG'],
+  'F_INT': ['F_ING', 'F_INK', 'F_ILL'],
+  'F_ELT': ['F_ELL', 'F_EST', 'F_END'],
+  'F_ORD': ['F_ORE', 'F_ORT', 'F_ORN'],
+  'F_ARD': ['F_ART', 'F_ARK', 'F_ARM'],
+  'F_ARM': ['F_ART', 'F_ARK', 'F_ARD'],
+  'F_AUL': ['F_ALL', 'F_AIR'],
+  'F_UB': ['F_UV', 'F_UG', 'F_UM'],
+  'F_UT': ['F_UST', 'F_USH', 'F_UG'],
+  'F_OB': ['F_OCK', 'F_OP', 'F_OG'],
+  'F_OG': ['F_OCK', 'F_OP', 'F_OT'],
+  'F_OT': ['F_OCK', 'F_OP', 'F_OB'],
 }
 
 const VOWEL_SOUND_MAP = {
   'long_i': ['F_IGHT','F_ITE','F_INE','F_IME','F_IRE','F_ILE','F_YPE','F_IPE'],
   'long_a': ['F_AY','F_AIN','F_ANE','F_AME','F_ACE','F_AZE','F_AIR','F_AZR'],
-  'long_e': ['F_EEN','F_EEL','F_EED','F_EEP','F_EEK','F_ELL'],
-  'long_o': ['F_ONE','F_OLD','F_OW','F_ONG','F_ORE','F_ORN'],
-  'long_u': ['F_OO','F_OOL','F_OOM','F_OON','F_OOD'],
-  'short_i': ['F_ILL','F_ING','F_INK','F_IP','F_IT','F_IG','F_ID'],
-  'short_a': ['F_ACK','F_AP','F_AB','F_AT','F_AN','F_AM','F_ASH'],
+  'long_e': ['F_EEN','F_EEL','F_EED','F_EEP','F_EEK','F_ELL','F_ELT'],
+  'long_o': ['F_ONE','F_OLD','F_OW','F_ONG','F_ORE','F_ORN','F_ORD'],
+  'long_u': ['F_OO','F_OOL','F_OOM','F_OON','F_OOD','F_UE'],
+  'short_i': ['F_ILL','F_ING','F_INK','F_IP','F_IT','F_IG','F_ID','F_INT'],
+  'short_a': ['F_ACK','F_AP','F_AB','F_AT','F_AN','F_AM','F_ASH','F_AUL'],
   'short_o': ['F_OCK','F_OP','F_OT','F_OB','F_OG'],
-  'short_u': ['F_UST','F_USH','F_UV','F_UG','F_UB','F_UN','F_UM','F_UNG','F_UNK','F_US','F_SHUN'],
+  'short_u': ['F_UST','F_USH','F_UV','F_UG','F_UB','F_UN','F_UM','F_UNG','F_UNK','F_US','F_UT','F_SHUN'],
   'ar_sound': ['F_ART','F_ARK','F_ARD','F_ARM'],
   'aw_sound': ['F_ALL','F_ORT','F_ORD'],
-  'ow_sound': ['F_OUND','F_OWN','F_OUT'],
+  'ow_sound': ['F_OUND','F_OWN','F_OUT','F_OW'],
   'ood_sound': ['F_OOD'],
+  'air_sound': ['F_AIR','F_EAR'],
+  'shun_sound': ['F_SHUN'],
 }
 
-function getVowelSound(family) {
+const RHYME_CACHE = Object.create(null)
+const FAMILY_CACHE = Object.create(null)
+const SYLLABLE_CACHE = Object.create(null)
+
+const WORD_TO_FAMILY = Object.create(null)
+const FAMILY_TO_WORDS = Object.create(null)
+const VOWEL_SOUND_TO_FAMILIES = Object.create(null)
+const SORTED_FAMILY_PATTERNS = [...FAMILY_PATTERNS].sort((a, b) => b[0].length - a[0].length)
+
+for (const [word, family] of RHYME_DICTIONARY) {
+  WORD_TO_FAMILY[word] = family
+  if (!FAMILY_TO_WORDS[family]) FAMILY_TO_WORDS[family] = []
+  FAMILY_TO_WORDS[family].push(word)
+}
+
+for (const [sound, families] of Object.entries(VOWEL_SOUND_MAP)) {
+  VOWEL_SOUND_TO_FAMILIES[sound] = families.slice()
+}
+
+const EXCEPTION_SYLLABLES = {
+  business: 2,
+  every: 2,
+  family: 3,
+  beautiful: 3,
+  chocolate: 2,
+  people: 2,
+  queue: 1,
+  rhythm: 2,
+  fire: 1,
+  hour: 1,
+  our: 1,
+  world: 1,
+  again: 2,
+  because: 2,
+  camera: 3,
+  different: 3,
+  interesting: 3,
+  restaurant: 3,
+  memory: 3,
+  poem: 2,
+  poetry: 3,
+  little: 2,
+  bottle: 2,
+  apple: 2,
+  table: 2,
+  comfortable: 3,
+  umbrella: 3,
+  without: 2,
+  overtime: 3,
+  ordinary: 4,
+  everybodys: 4,
+  everybody: 4,
+  anything: 2,
+  something: 2,
+  nothing: 2,
+  somewhere: 2,
+}
+
+const THEME_KEYWORDS = {
+  hustle: ['grind', 'grinding', 'hustle', 'hustlin', 'hustling', 'work', 'working', 'struggle', 'pressure', 'build', 'building', 'chase', 'chasing', 'paper', 'stack', 'late', 'night'],
+  love: ['love', 'loved', 'heart', 'baby', 'kiss', 'touch', 'romance', 'desire', 'passion', 'forever', 'darling', 'bae', 'lover', 'crush', 'feel'],
+  introspective: ['night', 'alone', 'lonely', 'quiet', 'thinking', 'think', 'thought', 'thoughts', 'mirror', 'shadow', 'mind', 'memory', 'memories', 'reflect', 'silence', 'dream'],
+  money: ['money', 'cash', 'racks', 'bands', 'paper', 'drip', 'ice', 'flex', 'rich', 'wealth', 'stack', 'profit', 'coin', 'pay', 'paid', 'bling'],
+  pain: ['pain', 'hurt', 'scar', 'scars', 'broken', 'tears', 'cry', 'loss', 'suffer', 'healing', 'wound', 'bleed', 'missing', 'hurtin'],
+  victory: ['win', 'winning', 'rise', 'rising', 'climb', 'champion', 'crown', 'top', 'success', 'victory', 'shine', 'prove', 'achieve', 'victorious'],
+}
+
+const GENERIC_SUGGESTION_BANK = {
+  tight: [
+    'Still chasing the {rhyme}',
+    'I been moving for the {rhyme}',
+    'Built from nothing to the {rhyme}',
+  ],
+  balanced: [
+    'I been grinding every {rhyme}',
+    'Turned the pressure into {rhyme}',
+    'Kept my focus through the {rhyme}',
+  ],
+  loose: [
+    'I been grinding every single {rhyme}',
+    'Turned every setback into {rhyme}',
+    'Kept my head up through the {rhyme}',
+  ],
+}
+
+const FAMILY_SUGGESTION_BANK = {
+  F_IGHT: {
+    tight: [
+      'Now I’m shining in the {rhyme}',
+      'Turned the struggle into {rhyme}',
+      'Built my way through the {rhyme}',
+    ],
+    balanced: [
+      'I been moving through the {rhyme}',
+      'Turned the pressure into {rhyme}',
+      'Made the dark feel like {rhyme}',
+    ],
+    loose: [
+      'I been shining through the {rhyme} all night',
+      'Turned every setback into {rhyme} tonight',
+      'Built my lane and made it feel {rhyme}',
+    ],
+  },
+  F_INE: {
+    tight: [
+      'I keep my focus on the {rhyme}',
+      'Now the whole world feels {rhyme}',
+      'I been chasing what feels {rhyme}',
+    ],
+    balanced: [
+      'I keep my circle clean and {rhyme}',
+      'Now the picture coming in {rhyme}',
+      'Every move I make stays {rhyme}',
+    ],
+    loose: [
+      'I keep my vision sharp and {rhyme}',
+      'Now the future looking more {rhyme}',
+      'I been building something {rhyme}',
+    ],
+  },
+  F_AY: {
+    tight: [
+      'I been moving every {rhyme}',
+      'Turned the setback into {rhyme}',
+      'Found a better way to {rhyme}',
+    ],
+    balanced: [
+      'I been moving every single {rhyme}',
+      'Turned the pressure into {rhyme}',
+      'Found a better way through the {rhyme}',
+    ],
+    loose: [
+      'I been moving every single day to the {rhyme}',
+      'Turned the setback into something I could {rhyme}',
+      'Found a better way to make it all {rhyme}',
+    ],
+  },
+  F_EEN: {
+    tight: [
+      'I keep it clean and {rhyme}',
+      'Now the whole scene is {rhyme}',
+      'I been staying in the {rhyme}',
+    ],
+    balanced: [
+      'I keep the vision clear and {rhyme}',
+      'Now the whole team moving {rhyme}',
+      'I been keeping it steady and {rhyme}',
+    ],
+    loose: [
+      'I keep the vision clear and the motion {rhyme}',
+      'Now the whole team moving like a {rhyme}',
+      'I been staying in my lane and making it {rhyme}',
+    ],
+  },
+  F_OO: {
+    tight: [
+      'I keep it moving with the {rhyme}',
+      'Now I’m seeing clear as the {rhyme}',
+      'I been chasing something new and {rhyme}',
+    ],
+    balanced: [
+      'I keep it moving through the {rhyme}',
+      'Now the whole crew feel {rhyme}',
+      'I been seeing everything more {rhyme}',
+    ],
+    loose: [
+      'I keep it moving through the {rhyme} all night',
+      'Now the whole crew feel brand new and {rhyme}',
+      'I been seeing everything from a better {rhyme}',
+    ],
+  },
+  F_OW: {
+    tight: [
+      'I keep it moving with the {rhyme}',
+      'Now the whole room feeling {rhyme}',
+      'I been growing as I {rhyme}',
+    ],
+    balanced: [
+      'I keep it moving through the {rhyme}',
+      'Now the whole story feeling {rhyme}',
+      'I been growing while I {rhyme}',
+    ],
+    loose: [
+      'I keep it moving through the storm and the {rhyme}',
+      'Now the whole story bends but never {rhyme}',
+      'I been growing while the world around me {rhyme}',
+    ],
+  },
+  F_ORE: {
+    tight: [
+      'I keep reaching for more',
+      'Now I’m standing at the door',
+      'I was built to go further than before',
+    ],
+    balanced: [
+      'I keep reaching for more',
+      'Now I’m knocking on the door',
+      'I was built to go deeper than before',
+    ],
+    loose: [
+      'I keep reaching for more and more',
+      'Now I’m knocking on the door',
+      'I was built to go deeper than before',
+    ],
+  },
+  F_OCK: {
+    tight: [
+      'I keep it solid like a {rhyme}',
+      'Now the whole room feeling {rhyme}',
+      'I was made to shake the {rhyme}',
+    ],
+    balanced: [
+      'I keep it solid like a {rhyme}',
+      'Now the whole block feeling {rhyme}',
+      'I was made to move the {rhyme}',
+    ],
+    loose: [
+      'I keep it solid like a {rhyme} all day',
+      'Now the whole block feeling {rhyme}',
+      'I was made to shake the {rhyme} away',
+    ],
+  },
+  F_ACK: {
+    tight: [
+      'I’m coming back with the {rhyme}',
+      'Built it strong from the {rhyme}',
+      'I never fold, I stay {rhyme}',
+    ],
+    balanced: [
+      'I’m coming back with the {rhyme}',
+      'Built it strong from the {rhyme}',
+      'I never fold, I keep it {rhyme}',
+    ],
+    loose: [
+      'I’m coming back with the {rhyme} on my mind',
+      'Built it strong from the ground and stayed {rhyme}',
+      'I never fold, I keep it locked and {rhyme}',
+    ],
+  },
+  F_ART: {
+    tight: [
+      'I keep the fire in my {rhyme}',
+      'Now the whole room got a {rhyme}',
+      'I been moving from the {rhyme}',
+    ],
+    balanced: [
+      'I keep the fire in my {rhyme}',
+      'Now the whole room got a {rhyme}',
+      'I been moving from the {rhyme}',
+    ],
+    loose: [
+      'I keep the fire in my {rhyme} all night',
+      'Now the whole room got a {rhyme}',
+      'I been moving from the {rhyme} to the light',
+    ],
+  },
+  F_AIR: {
+    tight: [
+      'I keep it level in the {rhyme}',
+      'Now the whole city feel {rhyme}',
+      'I’m moving with no {rhyme}',
+    ],
+    balanced: [
+      'I keep it level in the {rhyme}',
+      'Now the whole city feel more {rhyme}',
+      'I’m moving with no fear or {rhyme}',
+    ],
+    loose: [
+      'I keep it level in the {rhyme} tonight',
+      'Now the whole city feel more {rhyme}',
+      'I’m moving with no fear or doubt or {rhyme}',
+    ],
+  },
+  F_UV: {
+    tight: [
+      'I keep it warm in the {rhyme}',
+      'Now I’m rising up above',
+      'I been moving with the {rhyme}',
+    ],
+    balanced: [
+      'I keep it warm in the {rhyme}',
+      'Now I’m rising up above',
+      'I been moving with a little more {rhyme}',
+    ],
+    loose: [
+      'I keep it warm in the {rhyme} and never fold',
+      'Now I’m rising up above',
+      'I been moving with a heart that stays {rhyme}',
+    ],
+  },
+  F_US: {
+    tight: [
+      'I keep it honest in the {rhyme}',
+      'Now the whole room feeling {rhyme}',
+      'I been moving with no {rhyme}',
+    ],
+    balanced: [
+      'I keep it honest in the {rhyme}',
+      'Now the whole room feeling more {rhyme}',
+      'I been moving with no fear or {rhyme}',
+    ],
+    loose: [
+      'I keep it honest in the {rhyme} all day',
+      'Now the whole room feeling more {rhyme}',
+      'I been moving with no fear or doubt in the way',
+    ],
+  },
+  F_UST: {
+    tight: [
+      'I keep it solid through the {rhyme}',
+      'Now the whole thing feel {rhyme}',
+      'I been moving with the {rhyme}',
+    ],
+    balanced: [
+      'I keep it solid through the {rhyme}',
+      'Now the whole thing feel more {rhyme}',
+      'I been moving with the kind of {rhyme}',
+    ],
+    loose: [
+      'I keep it solid through the {rhyme} and never fold',
+      'Now the whole thing feel more {rhyme}',
+      'I been moving with the kind of focus made of {rhyme}',
+    ],
+  },
+  F_ING: {
+    tight: [
+      'I keep it ringing through the {rhyme}',
+      'Now the whole room feel {rhyme}',
+      'I been moving like a {rhyme}',
+    ],
+    balanced: [
+      'I keep it ringing through the {rhyme}',
+      'Now the whole room feel more {rhyme}',
+      'I been moving like a steady {rhyme}',
+    ],
+    loose: [
+      'I keep it ringing through the {rhyme} tonight',
+      'Now the whole room feel more {rhyme}',
+      'I been moving like a steady {rhyme} in the light',
+    ],
+  },
+  F_ILL: {
+    tight: [
+      'I keep it steady on the {rhyme}',
+      'Now the whole room feels {rhyme}',
+      'I been moving up the {rhyme}',
+    ],
+    balanced: [
+      'I keep it steady on the {rhyme}',
+      'Now the whole room feels more {rhyme}',
+      'I been moving up the {rhyme}',
+    ],
+    loose: [
+      'I keep it steady on the {rhyme} tonight',
+      'Now the whole room feels more {rhyme}',
+      'I been moving up the {rhyme} with all my might',
+    ],
+  },
+  F_INE: {
+    tight: [
+      'I keep my focus on the {rhyme}',
+      'Now the whole world feels {rhyme}',
+      'I been chasing what feels {rhyme}',
+    ],
+    balanced: [
+      'I keep my circle clean and {rhyme}',
+      'Now the picture coming in {rhyme}',
+      'Every move I make stays {rhyme}',
+    ],
+    loose: [
+      'I keep my vision sharp and {rhyme}',
+      'Now the future looking more {rhyme}',
+      'I been building something {rhyme}',
+    ],
+  },
+  default: GENERIC_SUGGESTION_BANK,
+}
+
+function normalizeWordForLookup(word) {
+  if (!word) return ''
+  let w = String(word).toLowerCase().trim()
+  if (!w) return ''
+  w = w.replace(/[’']/g, '')
+  w = w.replace(/[^a-z-]/g, '')
+  if (w.includes('-')) {
+    const parts = w.split('-').filter(Boolean)
+    if (parts.length) w = parts[parts.length - 1]
+  }
+  w = w.replace(/[^a-z]/g, '')
+  return w
+}
+
+function getLastMeaningfulWord(input) {
+  if (!input) return ''
+  const text = String(input).trim()
+  if (!text) return ''
+  const parts = text.split(/\s+/).filter(Boolean)
+  if (!parts.length) return ''
+  return normalizeWordForLookup(parts[parts.length - 1])
+}
+
+function uniqueWords(list) {
+  const seen = new Set()
+  const out = []
+  for (const item of list || []) {
+    if (!item || seen.has(item)) continue
+    seen.add(item)
+    out.push(item)
+  }
+  return out
+}
+
+function uniqueByWord(list) {
+  const seen = new Set()
+  const out = []
+  for (const item of list || []) {
+    if (!item || !item.word) continue
+    if (seen.has(item.word)) continue
+    seen.add(item.word)
+    out.push(item)
+  }
+  return out
+}
+
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n))
+}
+
+function commonSuffixLength(a, b) {
+  const x = normalizeWordForLookup(a)
+  const y = normalizeWordForLookup(b)
+  const max = Math.min(x.length, y.length)
+  let count = 0
+  for (let i = 1; i <= max; i++) {
+    if (x[x.length - i] !== y[y.length - i]) break
+    count++
+  }
+  return count
+}
+
+function getFamilyVowelSound(family) {
   for (const [sound, families] of Object.entries(VOWEL_SOUND_MAP)) {
     if (families.includes(family)) return sound
   }
   return 'unknown'
 }
 
+function getNearFamilies(family) {
+  return NEAR_FAMILY_MAP[family] || []
+}
+
+function areNearFamilies(a, b) {
+  if (!a || !b) return false
+  if (a === b) return true
+  const nearA = getNearFamilies(a)
+  const nearB = getNearFamilies(b)
+  return nearA.includes(b) || nearB.includes(a)
+}
+
+function getVowelSoundSimilarity(a, b) {
+  const soundA = getFamilyVowelSound(a)
+  const soundB = getFamilyVowelSound(b)
+  if (soundA === 'unknown' || soundB === 'unknown') return 0
+  if (soundA === soundB) return 1
+  const closePairs = new Set([
+    `${soundA}:${soundB}`,
+    `${soundB}:${soundA}`,
+  ])
+  const looseMatches = [
+    ['long_i', 'air_sound'],
+    ['long_a', 'air_sound'],
+    ['long_o', 'ow_sound'],
+    ['short_o', 'ow_sound'],
+    ['short_u', 'long_u'],
+    ['short_i', 'long_e'],
+    ['long_e', 'air_sound'],
+  ]
+  for (const [x, y] of looseMatches) {
+    if (closePairs.has(`${x}:${y}`)) return 0.55
+  }
+  return 0.35
+}
+
+function getFamilyRelationScore(a, b) {
+  if (a === b) return 22
+  if (areNearFamilies(a, b)) return 14
+  if (getFamilyVowelSound(a) !== 'unknown' && getFamilyVowelSound(a) === getFamilyVowelSound(b)) return 9
+  return 0
+}
+
+function scoreRhymeCandidate(inputWord, candidateWord, relationType = 'slant') {
+  const source = normalizeWordForLookup(inputWord)
+  const candidate = normalizeWordForLookup(candidateWord)
+  if (!source || !candidate || source === candidate) return 0
+
+  const inputFamily = detectFamily(source)
+  const candidateFamily = detectFamily(candidate)
+  const inputSyl = countWordSyllables(source)
+  const candidateSyl = countWordSyllables(candidate)
+  const suffix = commonSuffixLength(source, candidate)
+  const suffixRatio = suffix / Math.max(3, Math.min(source.length, candidate.length))
+  const syllableSimilarity = 1 - (Math.abs(inputSyl - candidateSyl) / Math.max(1, Math.max(inputSyl, candidateSyl)))
+  const vowelSimilarity = getVowelSoundSimilarity(inputFamily, candidateFamily)
+  const familyScore = getFamilyRelationScore(inputFamily, candidateFamily)
+
+  const typeBase = {
+    perfect: 58,
+    near: 42,
+    slant: 28,
+    internal: 36,
+  }[relationType] || 28
+
+  let score =
+    typeBase +
+    familyScore +
+    Math.round(vowelSimilarity * 12) +
+    Math.round(suffixRatio * 22) +
+    Math.round(clamp(syllableSimilarity, 0, 1) * 16)
+
+  if (suffix >= 4) score += 6
+  if (suffix >= 5) score += 4
+  if (suffix >= 6) score += 4
+
+  if (relationType === 'perfect' && inputFamily === candidateFamily) score += 8
+  if (relationType === 'near' && areNearFamilies(inputFamily, candidateFamily)) score += 4
+  if (relationType === 'slant' && getFamilyVowelSound(inputFamily) === getFamilyVowelSound(candidateFamily)) score += 4
+  if (relationType === 'internal') score -= 2
+
+  return clamp(Math.round(score), 0, 100)
+}
+
+function dedupeAndSortRhymeList(items, limit = 24) {
+  const unique = uniqueByWord(items)
+  unique.sort((a, b) => b.score - a.score || a.syllables - b.syllables || a.word.localeCompare(b.word))
+  return unique.slice(0, limit)
+}
+
+function getCandidateWordsForFamilies(families) {
+  const out = []
+  const seen = new Set()
+  for (const family of families || []) {
+    const words = FAMILY_TO_WORDS[family] || []
+    for (const word of words) {
+      if (seen.has(word)) continue
+      seen.add(word)
+      out.push(word)
+    }
+  }
+  return out
+}
+
+function collectRhymes(inputWord, candidateFamilies, relationType, excludeWords = new Set()) {
+  const source = normalizeWordForLookup(inputWord)
+  if (!source) return []
+  const candidates = getCandidateWordsForFamilies(candidateFamilies)
+  const results = []
+  const seen = new Set()
+
+  for (const candidate of candidates) {
+    if (!candidate || candidate === source) continue
+    if (excludeWords.has(candidate) || seen.has(candidate)) continue
+    const score = scoreRhymeCandidate(source, candidate, relationType)
+    if (score <= 0) continue
+    seen.add(candidate)
+    results.push({
+      word: candidate,
+      syllables: countWordSyllables(candidate),
+      score,
+      type: relationType,
+    })
+  }
+
+  return dedupeAndSortRhymeList(results, 24)
+}
+
+function collectInternalRhymes(inputWord, excludeWords = new Set()) {
+  const source = normalizeWordForLookup(inputWord)
+  if (!source) return []
+  const inputFamily = detectFamily(source)
+  const inputSound = getFamilyVowelSound(inputFamily)
+  const results = []
+  const seen = new Set()
+
+  for (const [candidate] of RHYME_DICTIONARY) {
+    if (!candidate || candidate === source) continue
+    if (excludeWords.has(candidate) || seen.has(candidate)) continue
+    const candFamily = detectFamily(candidate)
+    const sameSound = inputSound !== 'unknown' && getFamilyVowelSound(candFamily) === inputSound
+    const sameFamily = candFamily === inputFamily
+    const sharedSuffix = commonSuffixLength(source, candidate)
+
+    if (!sameFamily && !sameSound && sharedSuffix < 3) continue
+
+    const score = scoreRhymeCandidate(source, candidate, 'internal')
+    if (score < 50) continue
+
+    seen.add(candidate)
+    results.push({
+      word: candidate,
+      syllables: countWordSyllables(candidate),
+      score,
+      type: 'internal',
+    })
+  }
+
+  return dedupeAndSortRhymeList(results, 24)
+}
+
+function getRhymeTargetsCombined(rhymeSets) {
+  const combined = []
+  const seen = new Set()
+  for (const key of ['perfect', 'near', 'slant']) {
+    const list = rhymeSets[key] || []
+    for (const item of list) {
+      if (!item || !item.word || seen.has(item.word)) continue
+      seen.add(item.word)
+      combined.push(item)
+    }
+  }
+  combined.sort((a, b) => b.score - a.score || a.syllables - b.syllables || a.word.localeCompare(b.word))
+  return combined.slice(0, 12)
+}
+
+function getThemeHits(words, family) {
+  const tokens = (words || [])
+    .map(w => normalizeWordForLookup(w))
+    .filter(Boolean)
+
+  const hits = []
+  for (const [theme, keywords] of Object.entries(THEME_KEYWORDS)) {
+    let score = 0
+    for (const token of tokens) {
+      if (keywords.includes(token)) score += 2
+      else {
+        for (const key of keywords) {
+          if (token === key || token.includes(key) || key.includes(token)) {
+            score += 1
+            break
+          }
+        }
+      }
+    }
+
+    if (family === 'F_IGHT' && theme === 'introspective' && (tokens.includes('night') || tokens.includes('tonight') || tokens.includes('midnight'))) {
+      score += 2
+    }
+
+    if (family === 'F_UV' && theme === 'love') score += 1
+    if (family === 'F_AY' && theme === 'hustle') score += 1
+    if (family === 'F_OO' && theme === 'victory') score += 1
+
+    if (score > 0) hits.push({ theme, score })
+  }
+
+  hits.sort((a, b) => b.score - a.score || a.theme.localeCompare(b.theme))
+  return hits.slice(0, 3).map(item => item.theme)
+}
+
+function getCadenceFromSyllables(total) {
+  if (total <= 6) return 'tight'
+  if (total <= 10) return 'balanced'
+  return 'loose'
+}
+
+function getDensityFromSyllables(total) {
+  if (total <= 6) return 'low'
+  if (total <= 10) return 'medium'
+  return 'high'
+}
+
+function getCountWords(text) {
+  return String(text || '')
+    .replace(/\n/g, ' ')
+    .split(/\s+/)
+    .map(normalizeWordForLookup)
+    .filter(Boolean)
+}
+
+function buildSuggestionPool(family, theme, cadence) {
+  const familyBank = FAMILY_SUGGESTION_BANK[family]
+  if (familyBank && familyBank[cadence]) return familyBank[cadence]
+  const themeBank = {
+    hustle: {
+      tight: [
+        'I been grinding every {rhyme}',
+        'Built it from the ground to {rhyme}',
+        'Turned the pressure into {rhyme}',
+      ],
+      balanced: [
+        'I been grinding every single {rhyme}',
+        'Turned the pressure into {rhyme}',
+        'Kept my focus through the {rhyme}',
+      ],
+      loose: [
+        'I been grinding every single day for the {rhyme}',
+        'Turned every setback into {rhyme}',
+        'Kept my head up through the {rhyme}',
+      ],
+    },
+    love: {
+      tight: [
+        'I keep falling back in {rhyme}',
+        'Still holding onto your {rhyme}',
+        'Got me dreaming in the {rhyme}',
+      ],
+      balanced: [
+        'I keep falling back in love with the {rhyme}',
+        'Still holding onto your {rhyme}',
+        'Got me dreaming in the {rhyme}',
+      ],
+      loose: [
+        'I keep falling back in love beneath the {rhyme}',
+        'Still holding onto your {rhyme}',
+        'Got me dreaming in the {rhyme} tonight',
+      ],
+    },
+    introspective: {
+      tight: [
+        'I keep thinking in the {rhyme}',
+        'Quiet thoughts keep making {rhyme}',
+        'Midnight moods feel so {rhyme}',
+      ],
+      balanced: [
+        'I keep thinking in the {rhyme}',
+        'Quiet thoughts keep making me {rhyme}',
+        'Midnight moods keep staying {rhyme}',
+      ],
+      loose: [
+        'I keep thinking in the {rhyme} until it fades',
+        'Quiet thoughts keep making me more {rhyme}',
+        'Midnight moods keep staying with me through the {rhyme}',
+      ],
+    },
+    money: {
+      tight: [
+        'All this paper got me {rhyme}',
+        'Now the whole room chasing {rhyme}',
+        'Counting stacks until the {rhyme}',
+      ],
+      balanced: [
+        'All this paper got me moving {rhyme}',
+        'Now the whole room chasing the {rhyme}',
+        'Counting stacks until the {rhyme}',
+      ],
+      loose: [
+        'All this paper got me moving like I made it {rhyme}',
+        'Now the whole room chasing the {rhyme}',
+        'Counting stacks until the {rhyme} comes through',
+      ],
+    },
+    pain: {
+      tight: [
+        'Still carrying this {rhyme}',
+        'Turning all my scars to {rhyme}',
+        'Healing slowly through the {rhyme}',
+      ],
+      balanced: [
+        'Still carrying this {rhyme}',
+        'Turning all my scars to something {rhyme}',
+        'Healing slowly through the {rhyme}',
+      ],
+      loose: [
+        'Still carrying this {rhyme} and I never fold',
+        'Turning all my scars to something {rhyme}',
+        'Healing slowly through the {rhyme} I hold',
+      ],
+    },
+    victory: {
+      tight: [
+        'Now I’m standing at the {rhyme}',
+        'Came from nothing, built to {rhyme}',
+        'Watch me rise and take the {rhyme}',
+      ],
+      balanced: [
+        'Now I’m standing at the {rhyme}',
+        'Came from nothing, built to {rhyme}',
+        'Watch me rise and take the {rhyme}',
+      ],
+      loose: [
+        'Now I’m standing at the {rhyme} and looking back',
+        'Came from nothing, built to {rhyme}',
+        'Watch me rise and take the {rhyme} in full attack',
+      ],
+    },
+  }
+
+  const themeBank = themeBank[theme] || GENERIC_SUGGESTION_BANK
+  return themeBank[cadence] || GENERIC_SUGGESTION_BANK[cadence]
+}
+
+function buildSuggestionLine({ family, theme, cadence, rhymeWord, index }) {
+  const templates = buildSuggestionPool(family, theme, cadence)
+  const template = templates[index % templates.length] || GENERIC_SUGGESTION_BANK[cadence][0]
+  const cleanRhyme = normalizeWordForLookup(rhymeWord)
+  return template.replace(/\{rhyme\}/g, cleanRhyme || rhymeWord).replace(/\s+/g, ' ').trim()
+}
+
+function detectInternalRhymesInLine(words) {
+  const tokens = (words || []).map(normalizeWordForLookup).filter(Boolean)
+  const pairs = []
+  const seen = new Set()
+
+  for (let i = 0; i < tokens.length; i++) {
+    for (let j = i + 1; j < tokens.length; j++) {
+      const a = tokens[i]
+      const b = tokens[j]
+      if (!a || !b || a === b) continue
+      const key = a < b ? `${a}|${b}` : `${b}|${a}`
+      if (seen.has(key)) continue
+
+      const familyA = detectFamily(a)
+      const familyB = detectFamily(b)
+      const sharedSuffix = commonSuffixLength(a, b)
+      const sameFamily = familyA === familyB
+      const sameSound = getFamilyVowelSound(familyA) !== 'unknown' && getFamilyVowelSound(familyA) === getFamilyVowelSound(familyB)
+
+      if (!sameFamily && !sameSound && sharedSuffix < 3) continue
+
+      const score = scoreRhymeCandidate(a, b, 'internal')
+      if (score < 55) continue
+
+      seen.add(key)
+      pairs.push({
+        words: [a, b],
+        score,
+        type: 'internal',
+        family: sameFamily ? familyA : undefined,
+      })
+    }
+  }
+
+  pairs.sort((a, b) => b.score - a.score)
+  return pairs.slice(0, 8)
+}
+
+function detectFamily(origWord) {
+  const input = normalizeWordForLookup(origWord)
+  if (!input) return 'F_'
+
+  if (FAMILY_CACHE[input]) return FAMILY_CACHE[input]
+
+  const candidateForms = uniqueWords([
+    input,
+    input.replace(/-/g, ''),
+    input.endsWith('e') ? input.slice(0, -1) : '',
+    input.endsWith('es') ? input.slice(0, -2) : '',
+    input.endsWith('ed') ? input.slice(0, -2) : '',
+    input.endsWith('ing') ? input.slice(0, -3) : '',
+  ].filter(Boolean))
+
+  for (const form of candidateForms) {
+    if (WORD_TO_FAMILY[form]) {
+      FAMILY_CACHE[input] = WORD_TO_FAMILY[form]
+      return FAMILY_CACHE[input]
+    }
+  }
+
+  for (const form of candidateForms) {
+    for (const [pattern, family] of SORTED_FAMILY_PATTERNS) {
+      if (form.endsWith(pattern)) {
+        FAMILY_CACHE[input] = family
+        return family
+      }
+    }
+  }
+
+  if (input.endsWith('e') && input.length > 3 && !input.endsWith('ee')) {
+    const withoutE = input.slice(0, -1)
+    for (const [pattern, family] of SORTED_FAMILY_PATTERNS) {
+      if (withoutE.endsWith(pattern)) {
+        FAMILY_CACHE[input] = family
+        return family
+      }
+    }
+  }
+
+  if (input.endsWith('er') && input.length > 3) {
+    FAMILY_CACHE[input] = 'F_AIR'
+    return 'F_AIR'
+  }
+
+  if (input.endsWith('or') && input.length > 3) {
+    FAMILY_CACHE[input] = 'F_ORE'
+    return 'F_ORE'
+  }
+
+  if (input.endsWith('re') && input.length > 3) {
+    FAMILY_CACHE[input] = 'F_AIR'
+    return 'F_AIR'
+  }
+
+  if (input.endsWith('tion') || input.endsWith('sion') || input.endsWith('cian')) {
+    FAMILY_CACHE[input] = 'F_SHUN'
+    return 'F_SHUN'
+  }
+
+  let heuristic = input
+    .replace(/(ing|ed|es|s)$/, '')
+    .replace(/[^aeiouy]+$/, '')
+
+  if (!heuristic) {
+    const tail = input.slice(-3)
+    heuristic = tail.replace(/[^a-z]/g, '')
+  }
+
+  if (!heuristic) heuristic = input.slice(-2)
+
+  const family = `F_${heuristic.toUpperCase()}`
+  FAMILY_CACHE[input] = family
+  return family
+}
+
 function getRhymes(inputWord) {
-  const word = inputWord.toLowerCase().trim()
+  const word = getLastMeaningfulWord(inputWord)
   if (!word) return { perfect: [], near: [], slant: [] }
+  if (RHYME_CACHE[word]) return RHYME_CACHE[word]
 
   const detectedFamily = detectFamily(word)
-
-  const perfect = RHYME_DICTIONARY
-    .filter(e => e[1] === detectedFamily && e[0] !== word)
-    .map(e => ({ word: e[0], syllables: countWordSyllables(e[0]) }))
-
+  const perfectFamilies = [detectedFamily]
   const nearFamilies = getNearFamilies(detectedFamily)
-  const near = RHYME_DICTIONARY
-    .filter(e => nearFamilies.includes(e[1]) && e[1] !== detectedFamily && e[0] !== word)
-    .map(e => ({ word: e[0], syllables: countWordSyllables(e[0]) }))
+  const vowelSound = getFamilyVowelSound(detectedFamily)
+  const slantFamilies = uniqueWords(
+    Object.values(VOWEL_SOUND_TO_FAMILIES).flat().filter(fam => {
+      if (fam === detectedFamily) return false
+      if (nearFamilies.includes(fam)) return false
+      return vowelSound !== 'unknown' && getFamilyVowelSound(fam) === vowelSound
+    })
+  )
 
-  const vowelSound = getVowelSound(detectedFamily)
-  const slant = RHYME_DICTIONARY
-    .filter(e => getVowelSound(e[1]) === vowelSound
-      && e[1] !== detectedFamily
-      && !nearFamilies.includes(e[1])
-      && e[0] !== word)
-    .map(e => ({ word: e[0], syllables: countWordSyllables(e[0]) }))
+  const perfect = collectRhymes(word, perfectFamilies, 'perfect')
+  const perfectWords = new Set(perfect.map(item => item.word))
+  const near = collectRhymes(word, nearFamilies, 'near', perfectWords)
+  const nearWords = new Set([...perfectWords, ...near.map(item => item.word)])
+  const slant = collectRhymes(word, slantFamilies, 'slant', nearWords)
 
-  return {
-    perfect: [...new Map(perfect.map(x => [x.word, x])).values()].slice(0, 24),
-    near: [...new Map(near.map(x => [x.word, x])).values()].slice(0, 24),
-    slant: [...new Map(slant.map(x => [x.word, x])).values()].slice(0, 24)
+  const result = {
+    perfect: perfect.slice(0, 24),
+    near: near.slice(0, 24),
+    slant: slant.slice(0, 24),
   }
+
+  RHYME_CACHE[word] = result
+  return result
+}
+
+function getAdvancedRhymes(word, options = {}) {
+  const {
+    multiSyllable = false,
+    includeInternal = false,
+    matchSyllableCount = false,
+  } = options || {}
+
+  const source = getLastMeaningfulWord(word)
+  if (!source) {
+    return includeInternal ? { perfect: [], near: [], slant: [], internal: [] } : { perfect: [], near: [], slant: [] }
+  }
+
+  const base = getRhymes(source)
+  const inputSyl = countWordSyllables(source)
+
+  const filterList = (list) => {
+    let items = list.slice()
+    if (multiSyllable) {
+      items = items.filter(item => item.syllables >= 2)
+    }
+    if (matchSyllableCount) {
+      items = items.filter(item => item.syllables === inputSyl)
+    }
+    return dedupeAndSortRhymeList(items, 24)
+  }
+
+  const perfect = filterList(base.perfect)
+  const perfectWords = new Set(perfect.map(item => item.word))
+  const near = filterList(base.near.filter(item => !perfectWords.has(item.word)))
+  const nearWords = new Set([...perfectWords, ...near.map(item => item.word)])
+  const slant = filterList(base.slant.filter(item => !nearWords.has(item.word)))
+
+  const result = { perfect, near, slant }
+
+  if (includeInternal) {
+    const internal = collectInternalRhymes(source, new Set([
+      ...perfect.map(item => item.word),
+      ...near.map(item => item.word),
+      ...slant.map(item => item.word),
+    ]))
+    result.internal = filterList(internal)
+  }
+
+  return result
 }
 
 function countWordSyllables(word) {
   if (!word) return 0
-  const w = word.toLowerCase().replace(/[^a-z]/g, '')
-  if (w.length <= 3) return 1
-  return w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '')
-          .replace(/^y/, '')
-          .match(/[aeiouy]{1,2}/g)?.length || 1
+  const clean = normalizeWordForLookup(word)
+  if (!clean) return 0
+  if (SYLLABLE_CACHE[clean] != null) return SYLLABLE_CACHE[clean]
+
+  if (EXCEPTION_SYLLABLES[clean] != null) {
+    SYLLABLE_CACHE[clean] = EXCEPTION_SYLLABLES[clean]
+    return SYLLABLE_CACHE[clean]
+  }
+
+  if (clean.includes('-')) {
+    const parts = clean.split('-').filter(Boolean)
+    if (parts.length > 1) {
+      const total = parts.reduce((sum, part) => sum + countWordSyllables(part), 0)
+      SYLLABLE_CACHE[clean] = Math.max(1, total)
+      return SYLLABLE_CACHE[clean]
+    }
+  }
+
+  if (clean.length <= 3) {
+    SYLLABLE_CACHE[clean] = 1
+    return 1
+  }
+
+  let wordToCount = clean
+
+  if (wordToCount.endsWith('ies') && wordToCount.length > 3) {
+    wordToCount = `${wordToCount.slice(0, -3)}y`
+  }
+
+  let syllables = (wordToCount.match(/[aeiouy]+/g) || []).length
+
+  if (wordToCount.endsWith('e')) {
+    if (!/(?:[aeiou]le|ye|ee|oe|ie|ue)$/.test(wordToCount)) {
+      syllables -= 1
+    }
+  }
+
+  if (/[^aeiou]le$/.test(wordToCount) && wordToCount.length > 2) {
+    syllables += 1
+  }
+
+  if (wordToCount.endsWith('ed') && !/(?:ted|ded)$/.test(wordToCount)) {
+    syllables -= 1
+  }
+
+  if (wordToCount.endsWith('es') && !/(?:ses|xes|zes|ches|shes|ges)$/.test(wordToCount)) {
+    syllables -= 1
+  }
+
+  if (wordToCount.startsWith('mc')) syllables += 1
+  if (wordToCount.match(/ia|io|eo|ii|ua/)) syllables += 1
+
+  syllables = Math.max(1, syllables)
+  SYLLABLE_CACHE[clean] = syllables
+  return syllables
 }
 
 function countSyllables(text) {
-  const lines = text.split('\n')
+  const source = Array.isArray(text) ? text.join('\n') : String(text || '')
+  const lines = source.split('\n')
+
   return lines.map(line => {
-    const words = line.trim().split(/\s+/)
-    if (words.length === 1 && words[0] === '') return { line, syllableCount: 0 }
+    const trimmed = line == null ? '' : String(line).trim()
+    if (!trimmed) {
+      return {
+        line: line ?? '',
+        syllableCount: 0,
+        density: 'low',
+      }
+    }
+
+    const words = trimmed.split(/\s+/).filter(Boolean)
     let total = 0
-    words.forEach(w => {
-      if (w) total += countWordSyllables(w)
-    })
-    return { line, syllableCount: total }
+    for (const w of words) total += countWordSyllables(w)
+
+    return {
+      line,
+      syllableCount: total,
+      density: getDensityFromSyllables(total),
+    }
   })
 }
 
 function analyzeRhymeScheme(lines) {
-  if (!lines || lines.length < 2) return { scheme: 'none', confidence: 0 }
-  const schemeLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  let currentLetterIdx = 0
-  const endingSoundMap = {}
-  let pattern = ''
-  
-  for (const line of lines) {
-    const cleanLine = line.trim()
-    if (!cleanLine) continue
-    const words = cleanLine.split(/\s+/)
-    const lastWord = words[words.length - 1].toLowerCase().replace(/[^a-z]/g, '')
-    
-    let matchedLetter = null
-    for (const [key, value] of Object.entries(endingSoundMap)) {
-      if (value.includes(lastWord) || getRhymes(lastWord).perfect.some(rw => value.includes(rw.word))) {
-        matchedLetter = key
-        endingSoundMap[key].push(lastWord)
-        break
-      }
-    }
-    
-    if (matchedLetter) {
-        pattern += matchedLetter
-    } else {
-        const letter = schemeLetters[currentLetterIdx++]
-        endingSoundMap[letter] = [lastWord]
-        pattern += letter
+  const sourceLines = Array.isArray(lines)
+    ? lines.slice()
+    : String(lines || '').split('\n')
+
+  const cleanedLines = sourceLines
+    .map(line => (line == null ? '' : String(line)).trim())
+    .filter(Boolean)
+
+  if (cleanedLines.length < 2) {
+    return {
+      scheme: 'none',
+      confidence: 0,
+      rhymesDetected: 0,
+      patternStrength: 'weak',
     }
   }
-  
-  if (pattern.length < 2) return { scheme: 'none', confidence: 0 }
-  return { scheme: pattern, confidence: 80 }
+
+  const groups = []
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  let letterIndex = 0
+  let scheme = ''
+  let rhymesDetected = 0
+  let totalMatchScore = 0
+
+  for (const line of cleanedLines) {
+    const words = line.split(/\s+/).filter(Boolean)
+    const ending = getLastMeaningfulWord(words[words.length - 1] || '')
+    if (!ending) {
+      const newLetter = letters[letterIndex++] || 'Z'
+      groups.push({ letter: newLetter, words: [ending] })
+      scheme += newLetter
+      continue
+    }
+
+    let bestGroup = null
+    let bestScore = 0
+
+    for (const group of groups) {
+      const rep = group.words[group.words.length - 1]
+      if (!rep) continue
+      const score = scoreRhymeCandidate(ending, rep, 'perfect')
+      const nearScore = Math.max(
+        score,
+        scoreRhymeCandidate(ending, rep, 'near'),
+        scoreRhymeCandidate(ending, rep, 'slant'),
+      )
+
+      if (nearScore > bestScore) {
+        bestScore = nearScore
+        bestGroup = group
+      }
+    }
+
+    if (bestGroup && bestScore >= 58) {
+      bestGroup.words.push(ending)
+      scheme += bestGroup.letter
+      rhymesDetected += 1
+      totalMatchScore += bestScore
+    } else {
+      const newLetter = letters[letterIndex++] || letters[letters.length - 1]
+      groups.push({ letter: newLetter, words: [ending] })
+      scheme += newLetter
+    }
+  }
+
+  const avgScore = rhymesDetected > 0 ? totalMatchScore / rhymesDetected : 0
+  const confidence = clamp(
+    Math.round(
+      (rhymesDetected / Math.max(1, cleanedLines.length - 1)) * 60 +
+      (avgScore / 100) * 35 +
+      (groups.some(g => g.words.length >= 2) ? 5 : 0)
+    ),
+    0,
+    100
+  )
+
+  let patternStrength = 'weak'
+  if (rhymesDetected >= 3 && avgScore >= 74) patternStrength = 'strong'
+  else if (rhymesDetected >= 1 && avgScore >= 58) patternStrength = 'moderate'
+
+  return {
+    scheme: scheme || 'none',
+    confidence,
+    rhymesDetected,
+    patternStrength,
+  }
+}
+
+function generateLyricSuggestions(line) {
+  const sourceLine = String(line || '').trim()
+  const words = getCountWords(sourceLine)
+  const lastWord = getLastMeaningfulWord(sourceLine)
+  const detectedFamily = lastWord ? detectFamily(lastWord) : 'F_'
+  const syllableCount = countWordSyllables(sourceLine ? sourceLine.split(/\s+/).filter(Boolean).join(' ') : '')
+  const cadence = getCadenceFromSyllables(syllableCount)
+  const themes = getThemeHits(words, detectedFamily)
+  const rhymeSets = getAdvancedRhymes(lastWord || sourceLine, {
+    multiSyllable: syllableCount > 6,
+    includeInternal: true,
+    matchSyllableCount: false,
+  })
+
+  const rhymeTargets = getRhymeTargetsCombined(rhymeSets)
+  const internalRhymes = detectInternalRhymesInLine(words)
+
+  const primaryTheme = themes[0] || 'hustle'
+  const suggestions = []
+  const used = new Set()
+
+  const candidateTargets = []
+  for (const item of rhymeTargets) {
+    if (!item || !item.word || used.has(item.word)) continue
+    used.add(item.word)
+    candidateTargets.push(item)
+    if (candidateTargets.length >= 6) break
+  }
+
+  if (!candidateTargets.length) {
+    candidateTargets.push(
+      { word: lastWord || 'day', syllables: countWordSyllables(lastWord || 'day'), score: 50, type: 'perfect' },
+      { word: 'light', syllables: 1, score: 45, type: 'perfect' },
+      { word: 'right', syllables: 1, score: 43, type: 'perfect' },
+    )
+  }
+
+  const targetCount = clamp(Math.max(3, Math.min(6, candidateTargets.length)), 3, 6)
+  for (let i = 0; i < targetCount; i++) {
+    const target = candidateTargets[i % candidateTargets.length]
+    const suggestion = buildSuggestionLine({
+      family: detectedFamily,
+      theme: primaryTheme,
+      cadence,
+      rhymeWord: target.word,
+      index: i,
+    })
+    if (suggestion && !suggestions.includes(suggestion)) suggestions.push(suggestion)
+  }
+
+  while (suggestions.length < 3) {
+    const fallback = buildSuggestionLine({
+      family: detectedFamily,
+      theme: primaryTheme,
+      cadence,
+      rhymeWord: lastWord || 'day',
+      index: suggestions.length,
+    })
+    if (!suggestions.includes(fallback)) suggestions.push(fallback)
+    else break
+  }
+
+  return {
+    detectedFamily,
+    rhymeTargets,
+    internalRhymes,
+    syllables: syllableCount,
+    cadence,
+    themes,
+    suggestions: suggestions.slice(0, 6),
+  }
 }
 
 function getSongStructureTemplate(type) {
@@ -752,6 +1888,8 @@ function getWritingPrompts(sectionType) {
 
 module.exports = {
   getRhymes,
+  getAdvancedRhymes,
+  generateLyricSuggestions,
   countSyllables,
   analyzeRhymeScheme,
   getSongStructureTemplate,
