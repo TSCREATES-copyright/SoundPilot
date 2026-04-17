@@ -83,7 +83,7 @@ export default function Producer() {
     <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
       <div className="flex items-end justify-between mb-8 gap-4">
         <div>
-          <h2 className="page-title !mb-1">Producer AI</h2>
+          <h2 className="page-title !mb-1">Producer Pilot</h2>
           <p className="text-zinc-500 text-sm">Deep analysis of your creative output and workflow patterns.</p>
         </div>
         <div className="bg-[#181818] border border-zinc-800 rounded-2xl px-6 py-4 flex items-center gap-6 shadow-xl">
