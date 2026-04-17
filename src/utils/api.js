@@ -2,7 +2,9 @@
 // API BASE (Render backend)
 // ============================
 const API_BASE =
-  import.meta.env.VITE_API_URL || 'http://localhost:3001'
+  import.meta.env.DEV
+    ? 'http://localhost:3001'
+    : import.meta.env.VITE_API_URL
 
 // ============================
 // SAFE FETCH WRAPPER
@@ -12,18 +14,20 @@ async function safeFetch(url, options) {
   try {
     const res = await fetch(`${API_BASE}${url}`, options)
 
-    const contentType = res.headers.get('content-type')
+    const text = await res.text()
 
     if (!res.ok) {
-      console.warn('API error:', url, res.status)
+      console.error('API Error:', url, res.status, text)
       return null
     }
 
-    if (contentType && contentType.includes('application/json')) {
-      return await res.json()
+    try {
+      return JSON.parse(text)
+    } catch {
+      console.error('Invalid JSON:', url, text)
+      return null
     }
 
-    return null
   } catch (err) {
     console.error('Network error:', url, err)
     return null

@@ -28,4 +28,13 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const PORT = process.env.PORT || 3001
-app.listen(PORT, () => console.log(`SoundPilot server running on port ${PORT}`))
+
+const server = app.listen(PORT, () =>
+  console.log(`SoundPilot server running on port ${PORT}`)
+)
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`Port ${PORT} is busy. Try closing other Node processes.`)
+  }
+})
