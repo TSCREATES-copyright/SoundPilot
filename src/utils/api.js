@@ -1,10 +1,15 @@
 // ============================
 // API BASE (Render backend)
 // ============================
-const API_BASE =
-  import.meta.env.MODE === 'development'
+export const API_BASE =
+  import.meta.env.VITE_API_URL ??
+  (import.meta.env.DEV
     ? 'http://localhost:3001'
-    : import.meta.env.VITE_API_URL
+    : 'https://soundpilot.onrender.com')
+
+if (!API_BASE) {
+  throw new Error('API_BASE is not defined. Check VITE_API_URL env variable.')
+}
 
 // ============================
 // SAFE FETCH WRAPPER
@@ -37,8 +42,8 @@ async function safeFetch(url, options) {
 // ============================
 // SONGS
 // ============================
-export const getSongs = () =>
-  safeFetch('/api/songs') || []
+export const getSongs = async () =>
+  (await safeFetch('/api/songs')) ?? []
 
 export const uploadSong = (formData) =>
   safeFetch('/api/songs/upload', {
@@ -62,8 +67,8 @@ export const deleteSong = (id) =>
 // ============================
 // PROJECTS
 // ============================
-export const getProjects = () =>
-  safeFetch('/api/projects') || []
+export const getProjects = async () =>
+  (await safeFetch('/api/projects')) ?? []
 
 export const createProject = (data) =>
   safeFetch('/api/projects', {
@@ -85,14 +90,17 @@ export const deleteProject = (id) =>
 // ============================
 // RULES
 // ============================
-export const getRuleLogs = () =>
-  safeFetch('/api/rules/logs') || []
+export const getRuleLogs = async () =>
+  (await safeFetch('/api/rules/logs')) ?? []
+
+export const getRuleNotifications = async () =>
+  (await safeFetch('/api/rules/notifications')) ?? []
 
 // ============================
 // PROJECT SONGS
 // ============================
-export const getProjectSongs = (id) =>
-  safeFetch(`/api/projects/${id}/songs`) || []
+export const getProjectSongs = async (id) =>
+  (await safeFetch(`/api/projects/${id}/songs`)) ?? []
 
 export const addSongToProject = (id, song_id) =>
   safeFetch(`/api/projects/${id}/songs`, {
@@ -130,8 +138,8 @@ export const getPlugins = () =>
 // ============================
 // LYRICS
 // ============================
-export const getLyricDrafts = () =>
-  safeFetch('/api/lyrics') || []
+export const getLyricDrafts = async () =>
+  (await safeFetch('/api/lyrics')) ?? []
 
 export const createLyricDraft = (data) =>
   safeFetch('/api/lyrics', {
@@ -181,3 +189,10 @@ export const getSyllables = (text) =>
 
 export const getWritingPrompts = (type) =>
   safeFetch(`/api/lyrics/tools/prompts?type=${encodeURIComponent(type)}`)
+
+export const analyzeLyrics = (text) =>
+  safeFetch('/api/lyrics/tools/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  })

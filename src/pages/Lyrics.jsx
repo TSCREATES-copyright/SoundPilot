@@ -4,7 +4,7 @@ import Spinner from '../components/Spinner'
 import {
   getLyricDrafts, createLyricDraft, getLyricDraft, updateLyricDraft, deleteLyricDraft,
   addLyricSection, updateLyricSection, deleteLyricSection,
-  getRhymes, getSyllables, getWritingPrompts, getSongs
+  getRhymes, getSyllables, getWritingPrompts, getSongs, analyzeLyrics
 } from '../utils/api'
 import { useToast } from '../components/ToastProvider'
 
@@ -513,13 +513,9 @@ function SectionCard({ section, index, total, onReload, onOpenRhymes }) {
     debounce(async (text) => {
       try {
         const c = await getSyllables(text)
-        setCounts(c || [])
-        const res = await fetch('/api/lyrics/tools/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({text})
-        }).then(r=>r.json())
-        setScheme(res.scheme || '')
+        setCounts(c ?? [])
+        const res = await analyzeLyrics(text)
+        setScheme(res?.scheme ?? '')
       } catch {}
     }, 500),
     []
@@ -541,7 +537,7 @@ function SectionCard({ section, index, total, onReload, onOpenRhymes }) {
   const handleFetchPrompts = async () => {
     try {
       const list = await getWritingPrompts(section.section_type)
-      setPrompts(list || [])
+      setPrompts(list ?? [])
     } catch {
       toast.error('Failed to load prompts')
     }

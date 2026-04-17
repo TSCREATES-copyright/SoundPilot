@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
+import { getRuleNotifications } from '../utils/api'
 
 const links = [
   { to: '/', label: '🏠 Home' },
@@ -19,9 +20,8 @@ function Sidebar() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('/api/rules/notifications')
-      const data = await res.json()
-      setNotifications(data || [])
+      const data = await getRuleNotifications()
+      setNotifications(data ?? [])
     } catch (e) {
       console.error(e)
     }
