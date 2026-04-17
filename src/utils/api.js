@@ -1,103 +1,179 @@
-export const getSongs = () => fetch('/api/songs').then((r) => r.json())
+// ============================
+// API BASE (Render backend)
+// ============================
+const API_BASE =
+  import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
+// ============================
+// SAFE FETCH WRAPPER
+// prevents JSON crash from HTML 404 pages
+// ============================
+async function safeFetch(url, options) {
+  try {
+    const res = await fetch(`${API_BASE}${url}`, options)
+
+    const contentType = res.headers.get('content-type')
+
+    if (!res.ok) {
+      console.warn('API error:', url, res.status)
+      return null
+    }
+
+    if (contentType && contentType.includes('application/json')) {
+      return await res.json()
+    }
+
+    return null
+  } catch (err) {
+    console.error('Network error:', url, err)
+    return null
+  }
+}
+
+// ============================
+// SONGS
+// ============================
+export const getSongs = () =>
+  safeFetch('/api/songs') || []
+
 export const uploadSong = (formData) =>
-  fetch('/api/songs/upload', { method: 'POST', body: formData }).then((r) => r.json())
-export const playSong = (id) => fetch(`/api/songs/${id}/play`, { method: 'POST' }).then((r) => r.json())
+  safeFetch('/api/songs/upload', {
+    method: 'POST',
+    body: formData
+  })
+
+export const playSong = (id) =>
+  safeFetch(`/api/songs/${id}/play`, { method: 'POST' })
+
 export const updateSong = (id, data) =>
-  fetch(`/api/songs/${id}`, {
+  safeFetch(`/api/songs/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
-  }).then((r) => r.json())
-export const deleteSong = (id) =>
-  fetch(`/api/songs/${id}`, { method: 'DELETE' }).then(r => r.json())
+  })
 
-export const getProjects = () => fetch('/api/projects').then((r) => r.json())
+export const deleteSong = (id) =>
+  safeFetch(`/api/songs/${id}`, { method: 'DELETE' })
+
+// ============================
+// PROJECTS
+// ============================
+export const getProjects = () =>
+  safeFetch('/api/projects') || []
+
 export const createProject = (data) =>
-  fetch('/api/projects', {
+  safeFetch('/api/projects', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
-  }).then((r) => r.json())
+  })
+
 export const updateProject = (id, data) =>
-  fetch(`/api/projects/${id}`, {
+  safeFetch(`/api/projects/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
-  }).then((r) => r.json())
-export const deleteProject = (id) =>
-  fetch(`/api/projects/${id}`, {
-    method: 'DELETE'
-  }).then((r) => r.json())
+  })
 
-export const getRuleLogs = () => fetch('/api/rules/logs').then((r) => r.json())
-export const getProjectSongs = (id) => fetch(`/api/projects/${id}/songs`).then((r) => r.json())
+export const deleteProject = (id) =>
+  safeFetch(`/api/projects/${id}`, { method: 'DELETE' })
+
+// ============================
+// RULES
+// ============================
+export const getRuleLogs = () =>
+  safeFetch('/api/rules/logs') || []
+
+// ============================
+// PROJECT SONGS
+// ============================
+export const getProjectSongs = (id) =>
+  safeFetch(`/api/projects/${id}/songs`) || []
+
 export const addSongToProject = (id, song_id) =>
-  fetch(`/api/projects/${id}/songs`, {
+  safeFetch(`/api/projects/${id}/songs`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ song_id })
-  }).then((r) => r.json())
+  })
+
 export const removeSongFromProject = (id, songId) =>
-  fetch(`/api/projects/${id}/songs/${songId}`, {
+  safeFetch(`/api/projects/${id}/songs/${songId}`, {
     method: 'DELETE'
-  }).then((r) => r.json())
+  })
 
-export const getProducerReport = () => fetch('/api/producer/report').then((r) => r.json())
-export const getProducerPatterns = () => fetch('/api/producer/patterns').then((r) => r.json())
-export const getProducerScore = () => fetch('/api/producer/score').then((r) => r.json())
-export const getProducerFeed = () => fetch('/api/producer/feed').then((r) => r.json())
-export const getProducerTimeline = () => fetch('/api/producer/timeline').then((r) => r.json())
+// ============================
+// PRODUCER
+// ============================
+export const getProducerReport = () =>
+  safeFetch('/api/producer/report')
 
-export const getLyricDrafts = () =>
-  fetch('/api/lyrics').then(r => r.json())
+export const getProducerPatterns = () =>
+  safeFetch('/api/producer/patterns')
 
-export const createLyricDraft = (data) =>
-  fetch('/api/lyrics', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json())
+export const getProducerScore = () =>
+  safeFetch('/api/producer/score')
 
-export const getLyricDraft = (id) =>
-  fetch(`/api/lyrics/${id}`).then(r => r.json())
+export const getProducerFeed = () =>
+  safeFetch('/api/producer/feed')
 
-export const updateLyricDraft = (id, data) =>
-  fetch(`/api/lyrics/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json())
-
-export const deleteLyricDraft = (id) =>
-  fetch(`/api/lyrics/${id}`, { method: 'DELETE' }).then(r => r.json())
-
-export const addLyricSection = (draftId, data) =>
-  fetch(`/api/lyrics/${draftId}/sections`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json())
-
-export const updateLyricSection = (sectionId, data) =>
-  fetch(`/api/lyrics/sections/${sectionId}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.json())
-
-export const deleteLyricSection = (sectionId) =>
-  fetch(`/api/lyrics/sections/${sectionId}`, {
-    method: 'DELETE'
-  }).then(r => r.json())
-
-export const getRhymes = (word) =>
-  fetch(`/api/lyrics/tools/rhyme?word=${encodeURIComponent(word)}`).then(r => r.json())
-
-export const getSyllables = (text) =>
-  fetch(`/api/lyrics/tools/syllables?text=${encodeURIComponent(text)}`).then(r => r.json())
-
-export const getWritingPrompts = (type) =>
-  fetch(`/api/lyrics/tools/prompts?type=${encodeURIComponent(type)}`).then(r => r.json())
+export const getProducerTimeline = () =>
+  safeFetch('/api/producer/timeline')
 
 export const getPlugins = () =>
-  fetch('/api/producer/plugins').then(r => r.json())
+  safeFetch('/api/producer/plugins')
+
+// ============================
+// LYRICS
+// ============================
+export const getLyricDrafts = () =>
+  safeFetch('/api/lyrics') || []
+
+export const createLyricDraft = (data) =>
+  safeFetch('/api/lyrics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+
+export const getLyricDraft = (id) =>
+  safeFetch(`/api/lyrics/${id}`)
+
+export const updateLyricDraft = (id, data) =>
+  safeFetch(`/api/lyrics/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+
+export const deleteLyricDraft = (id) =>
+  safeFetch(`/api/lyrics/${id}`, { method: 'DELETE' })
+
+export const addLyricSection = (draftId, data) =>
+  safeFetch(`/api/lyrics/${draftId}/sections`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+
+export const updateLyricSection = (sectionId, data) =>
+  safeFetch(`/api/lyrics/sections/${sectionId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+
+export const deleteLyricSection = (sectionId) =>
+  safeFetch(`/api/lyrics/sections/${sectionId}`, { method: 'DELETE' })
+
+// ============================
+// LYRICS TOOLS
+// ============================
+export const getRhymes = (word) =>
+  safeFetch(`/api/lyrics/tools/rhyme?word=${encodeURIComponent(word)}`)
+
+export const getSyllables = (text) =>
+  safeFetch(`/api/lyrics/tools/syllables?text=${encodeURIComponent(text)}`)
+
+export const getWritingPrompts = (type) =>
+  safeFetch(`/api/lyrics/tools/prompts?type=${encodeURIComponent(type)}`)
