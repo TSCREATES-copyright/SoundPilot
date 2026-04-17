@@ -58,7 +58,7 @@ export default function Coach() {
   return (
     <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
       <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '24px', borderLeft: '4px solid #fff', paddingLeft: '12px' }}>
-        AI Creative Coach
+        Pilot Creative Coach
       </h2>
 
       {!activeModule ? (

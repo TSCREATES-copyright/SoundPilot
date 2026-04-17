@@ -1,14 +1,16 @@
 // ============================
 // API BASE (Render backend)
 // ============================
-export const API_BASE =
-  import.meta.env.VITE_API_URL ??
-  (import.meta.env.DEV
-    ? 'http://localhost:3001'
-    : 'https://soundpilot.onrender.com')
+export const API_BASE = import.meta.env.VITE_API_URL
 
-if (!API_BASE) {
+console.log('API_BASE =', API_BASE)
+
+if (!API_BASE || !String(API_BASE).trim()) {
   throw new Error('API_BASE is not defined. Check VITE_API_URL env variable.')
+}
+
+if (String(API_BASE).includes('undefined')) {
+  throw new Error('API_BASE is invalid and contains "undefined". Check VITE_API_URL.')
 }
 
 // ============================

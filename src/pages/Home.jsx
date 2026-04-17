@@ -250,15 +250,15 @@ function Home() {
             gridTemplateColumns: '1fr 1fr',
             gap: '20px'
           }}>
-            {/* AI Insights */}
+            {/* Pilot Insights */}
             <section style={cardStyle}>
               <h3 className="mb-3 text-lg font-semibold flex items-center gap-2">
-                 <span>✨</span> AI Insights
+                 <span>✨</span> Pilot Insights
               </h3>
               {logs.length === 0 ? (
                 <div style={emptyStateStyle}>
                   <span className="text-3xl mb-2">💡</span>
-                  <p className="text-sm">No insights yet. Keep creating to unlock AI analysis.</p>
+                  <p className="text-sm">No insights yet. Keep creating to unlock Pilot analysis.</p>
                 </div>
               ) : (
                 <>
